@@ -8,12 +8,6 @@ import (
 	"testing"
 )
 
-type GetterFunc func(key string) ([]byte, error)
-
-func (f GetterFunc) Get(key string) ([]byte, error) {
-	return f(key)
-}
-
 var db = map[string]string{
 	"Tom":  "630",
 	"Jack": "589",
@@ -21,7 +15,7 @@ var db = map[string]string{
 }
 
 func TestGetter(t *testing.T) {
-	var f geecaches.Getter = GetterFunc(func(key string) ([]byte, error) {
+	var f geecaches.Getter = geecaches.GetterFunc(func(key string) ([]byte, error) {
 		return []byte(key), nil
 	})
 
@@ -33,7 +27,7 @@ func TestGetter(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	loadCounts := make(map[string]int, len(db))
-	gee := geecaches.NewGroup("scores", 2<<10, GetterFunc(
+	gee := geecaches.NewGroup("scores", 2<<10, geecaches.GetterFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[SlowDB] search key", key)
 			if v, ok := db[key]; ok {
@@ -62,7 +56,7 @@ func TestGet(t *testing.T) {
 
 func TestGetGroup(t *testing.T) {
 	groupName := "scores"
-	geecaches.NewGroup(groupName, 2<<10, GetterFunc(
+	geecaches.NewGroup(groupName, 2<<10, geecaches.GetterFunc(
 		func(key string) (bytes []byte, err error) { return }))
 	if group := geecaches.GetGroup(groupName); group == nil || group.Name() != groupName {
 		t.Fatalf("group %s not exist", groupName)
