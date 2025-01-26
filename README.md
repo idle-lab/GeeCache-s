@@ -9,3 +9,6 @@ This is a naive training project.
 
 - support multiple replacement policy.
 
+- durability.
+
+- Advanced data structures like lists, sets, and sorted sets.
