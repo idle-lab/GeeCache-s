@@ -1,6 +1,7 @@
 package geecaches
 
 import (
+	"geecache-s/cachePolicy"
 	pb "geecache-s/geecachespb"
 	"geecache-s/singleflight"
 	"log"
@@ -50,12 +51,13 @@ type Group struct {
 	loader *singleflight.Group
 }
 
-func NewGroup(name string, maxBytes int64, getter Getter) *Group {
+func NewGroup(name string, maxBytes int64, getter Getter, policy cachePolicy.CachePolicy) *Group {
 	g := &Group{
 		name:   name,
 		getter: getter,
 		mainCache: cache{
 			maxBytes: maxBytes,
+			policy:   policy,
 		},
 		loader: &singleflight.Group{},
 	}

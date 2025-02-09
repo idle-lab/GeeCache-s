@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	geecaches "geecache-s"
+	"geecache-s/cachePolicy"
 	"log"
 	"net/http"
 )
@@ -27,7 +28,7 @@ func main() {
 				return []byte(v), nil
 			}
 			return nil, fmt.Errorf("%s not exist", key)
-		}))
+		}), cachePolicy.LruPolicy)
 
 	addr := "localhost:8080"
 	peers := geecaches.NewHttpPool(addr)

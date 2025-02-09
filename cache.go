@@ -7,18 +7,19 @@ import (
 
 type cache struct {
 	mut      sync.Mutex
-	policy   cachePolicy.Cache
+	cache    cachePolicy.Cache
+	policy   cachePolicy.CachePolicy
 	maxBytes int64
 }
 
 func (c *cache) get(key string) (value ByteView, ok bool) {
 	c.mut.Lock()
 	defer c.mut.Unlock()
-	if c.policy == nil {
+	if c.cache == nil {
 		return
 	}
 
-	if value, ok := c.policy.Get(key); ok {
+	if value, ok := c.cache.Get(key); ok {
 		return value.(ByteView), true
 	}
 
@@ -29,11 +30,11 @@ func (c *cache) add(key string, value cachePolicy.Value) error {
 	c.mut.Lock()
 	defer c.mut.Unlock()
 
-	if c.policy == nil {
-		c.policy = cachePolicy.CreateCache(c.maxBytes, cachePolicy.CacheCallBack{}, cachePolicy.LruPolicy)
+	if c.cache == nil {
+		c.cache = cachePolicy.CreateCache(c.maxBytes, cachePolicy.CacheCallBack{}, c.policy)
 	}
 
-	if err := c.policy.Add(key, value); err != nil {
+	if err := c.cache.Add(key, value); err != nil {
 		return err
 	}
 

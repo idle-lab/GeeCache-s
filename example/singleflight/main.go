@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	geecaches "geecache-s"
+	"geecache-s/cachePolicy"
 	"io"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ func createGroup() *geecaches.Group {
 				return []byte(v), nil
 			}
 			return nil, fmt.Errorf("%s not exist", key)
-		}))
+		}), cachePolicy.LruPolicy)
 }
 
 func startCacheServer(addr string, addrs []string, gee *geecaches.Group) {

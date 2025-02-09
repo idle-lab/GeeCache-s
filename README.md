@@ -16,11 +16,12 @@ This project serves as an educational and simplified implementation of a groupca
   The system implements consistent hashing to distribute keys across nodes. However, dynamic handling of node additions or removals is not yet supported and is planned for future development.
 
 - **Caching Policies:**  
-  The current implementation supports the **Least Recently Used (LRU)** caching policy. The design is modular, allowing for seamless extension to incorporate additional replacement strategies in the future.
+  The current implementation supports the **Least Recently Used (LRU)** and **Least Frequently Used (LFU)** caching policy. The design is modular, allowing for seamless extension to incorporate additional replacement strategies in the future.
 
 ---
 
 ### **Planned Improvements (TODO)**
 
 - Add dynamic node handling for consistent hashing to better manage node additions and removals with minimal data movement.
-- Implement support for multiple cache replacement policies, such as LFU (Least Frequently Used) and LRU-K.  
+
+

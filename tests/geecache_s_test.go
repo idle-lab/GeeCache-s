@@ -3,6 +3,7 @@ package tests
 import (
 	"fmt"
 	geecaches "geecache-s"
+	"geecache-s/cachePolicy"
 	"log"
 	"reflect"
 	"testing"
@@ -38,7 +39,7 @@ func TestGet(t *testing.T) {
 				return []byte(v), nil
 			}
 			return nil, fmt.Errorf("%s not exist", key)
-		}))
+		}), cachePolicy.LruPolicy)
 
 	for k, v := range db {
 		if view, err := gee.Get(k); err != nil || view.String() != v {
@@ -57,7 +58,7 @@ func TestGet(t *testing.T) {
 func TestGetGroup(t *testing.T) {
 	groupName := "scores"
 	geecaches.NewGroup(groupName, 2<<10, geecaches.GetterFunc(
-		func(key string) (bytes []byte, err error) { return }))
+		func(key string) (bytes []byte, err error) { return }), cachePolicy.LruPolicy)
 	if group := geecaches.GetGroup(groupName); group == nil || group.Name() != groupName {
 		t.Fatalf("group %s not exist", groupName)
 	}

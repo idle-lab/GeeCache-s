@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-type entry struct {
-	key   string
-	value Value
-}
-
 // Value use Len to count how many bytes it takes
 type Value interface {
 	Size() int64
@@ -17,7 +12,7 @@ type Value interface {
 
 const (
 	LruPolicy = iota
-	LruKPolicy
+	LfuPolicy
 )
 
 type CachePolicy int
@@ -33,7 +28,7 @@ type Cache interface {
 	// When length of value is larger than maxBytes, Add will return a error.
 	Add(key string, value Value) error
 
-	// Evict a oldest (k, v) pair.
+	// Evict a (k, v) pair.
 	Evict()
 
 	// Return number of (k, v) pairs.
@@ -57,6 +52,15 @@ func CreateCache(maxBytes int64, callBacks CacheCallBack, cacheType CachePolicy)
 		return &LRUCache{
 			usedMap:       make(map[string]*list.Element),
 			usedList:      list.New(),
+			maxBytes:      maxBytes,
+			curBytes:      0,
+			CacheCallBack: callBacks,
+		}
+	case LfuPolicy:
+		return &LFUCache{
+			freqList:      list.New(),
+			freqMap:       make(map[int]*list.Element),
+			entryMap:      make(map[string]*list.Element),
 			maxBytes:      maxBytes,
 			curBytes:      0,
 			CacheCallBack: callBacks,
