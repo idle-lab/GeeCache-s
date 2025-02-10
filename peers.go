@@ -3,10 +3,11 @@ package geecaches
 import pb "geecache-s/geecachespb"
 
 type PeerPicker interface {
-	PickPeer(key string) (PeerGetter, bool)
+	PickPeer(key string) (PeerHandler, bool)
 	SelfAddr() string
 }
 
-type PeerGetter interface {
-	Get(in *pb.Request, out *pb.Response) error
+type PeerHandler interface {
+	Get(in *pb.GetRequest, out *pb.GetResponse) error
+	Add(in *pb.AddRequest, out *pb.Empty) error
 }

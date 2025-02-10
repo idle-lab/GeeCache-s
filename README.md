@@ -20,8 +20,6 @@ This project serves as an educational and simplified implementation of a groupca
 
 ---
 
-### **Planned Improvements (TODO)**
+## How to use?
 
-- Add dynamic node handling for consistent hashing to better manage node additions and removals with minimal data movement.
-
-
+please refer to [kvs](./example/kvs/)

@@ -1,6 +1,7 @@
 package geecaches
 
 import (
+	"fmt"
 	"geecache-s/cachePolicy"
 	pb "geecache-s/geecachespb"
 	"geecache-s/singleflight"
@@ -38,6 +39,29 @@ func GetGroup(name string) *Group {
 	return g
 }
 
+type GroupOptions struct {
+	// The caching policy of this group
+	// Default: LRU
+	CachePolicy cachePolicy.CachePolicy
+
+	// If the cache does not contain the specified key and that key is managed by the current node,
+	// the Getter function is automatically invoked to fetch its corresponding value.
+	// If the user does not specify this function, the Get() function will return an error when the cache misses
+	// Default: nil
+	Getter Getter
+
+	// The maximum number of bytes that a cache can occupy in memory.
+	// When the value is 0, there is no limit on memory usage.
+	// Default: 0
+	MaxBytes int64
+}
+
+func NewGroupOptions() *GroupOptions {
+	return &GroupOptions{
+		CachePolicy: cachePolicy.LruPolicy,
+	}
+}
+
 // A Group is a cache namespace and associated data loaded spread over
 // a group of 1 or more machines.
 type Group struct {
@@ -69,13 +93,31 @@ func NewGroup(name string, maxBytes int64, getter Getter, policy cachePolicy.Cac
 	return g
 }
 
+func NewGroupWithOpts(name string, opts *GroupOptions) *Group {
+	g := &Group{
+		name:   name,
+		getter: opts.Getter,
+		mainCache: cache{
+			maxBytes: opts.MaxBytes,
+			policy:   opts.CachePolicy,
+		},
+		loader: &singleflight.Group{},
+	}
+
+	groupsMut.Lock()
+	groups[name] = g
+	groupsMut.Unlock()
+
+	return g
+}
+
 func (g *Group) Name() string {
 	return g.name
 }
 
 func (g *Group) RegisterPeers(peersPicker PeerPicker) {
 	if g.peersPicker != nil {
-		panic("RegisterPeerPicker called more than once")
+		panic("registerPeerPicker called more than once")
 	}
 	g.peersPicker = peersPicker
 }
@@ -106,6 +148,9 @@ func (g *Group) load(key string) (ByteView, error) {
 }
 
 func (g *Group) loadLocally(key string) (ByteView, error) {
+	if g.getter == nil {
+		return ByteView{}, fmt.Errorf("no getter specified, unable to retrieve data")
+	}
 	value, err := g.getter.Get(key)
 	if err != nil {
 		return ByteView{}, err
@@ -116,15 +161,33 @@ func (g *Group) loadLocally(key string) (ByteView, error) {
 	return v, nil
 }
 
-func (g *Group) loadRemotely(key string, peerGetter PeerGetter) (ByteView, error) {
-	in := &pb.Request{
+func (g *Group) loadRemotely(key string, peer PeerHandler) (ByteView, error) {
+	in := &pb.GetRequest{
 		Group: g.Name(),
 		Key:   key,
 	}
-	out := &pb.Response{}
-	err := peerGetter.Get(in, out)
+	out := &pb.GetResponse{}
+	err := peer.Get(in, out)
 	if err != nil {
 		return ByteView{}, err
 	}
 	return ByteView{out.Value}, nil
+}
+
+func (g *Group) Add(key string, value ByteView) error {
+	if peer, ok := g.peersPicker.PickPeer(key); ok {
+		in := &pb.AddRequest{
+			Group: g.name,
+			Key:   key,
+			Value: value.btyes,
+		}
+		empty := &pb.Empty{}
+		// add remotely
+		if err := peer.Add(in, empty); err != nil {
+			return err
+		}
+	}
+
+	// add locally
+	return g.mainCache.add(key, value)
 }

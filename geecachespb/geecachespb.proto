@@ -4,15 +4,24 @@ option go_package = "./";  // 设置 Go 包路径
 
 package geecachespb;
 
-message Request {
+message GetRequest {
   string group = 1;
   string key = 2;
 }
 
-message Response {
+message GetResponse {
   bytes value = 1;
 }
 
+message AddRequest {
+  string group = 1;
+  string key = 2;
+  bytes value = 3;
+}
+
+message Empty {}
+
 service GroupCache {
-  rpc Get(Request) returns (Response);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Add(AddRequest) returns (Empty);
 }
