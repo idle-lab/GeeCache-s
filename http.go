@@ -7,7 +7,6 @@ import (
 	pb "geecache-s/geecachespb"
 	"hash/crc32"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -145,7 +144,7 @@ func (p *HttpPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Set updates the pool's list of peers.
 // Each peer value should be a valid base URL,
 // for example "http://example.net:8000".
-func (p *HttpPool) Set(peers ...string) {
+func (p *HttpPool) SetPeers(peers ...string) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.peers = consistenthash.New(p.opts.Replicas, p.opts.HashFn)
@@ -164,9 +163,8 @@ func (p *HttpPool) PickPeer(key string) (PeerHandler, bool) {
 	if peer == "" || p.self == peer {
 		return nil, false
 	}
-	if peerGetter, ok := p.httpHandlers[peer]; ok {
-		log.Printf("Pick peer %s", peer)
-		return peerGetter, true
+	if httpHandler, ok := p.httpHandlers[peer]; ok {
+		return httpHandler, true
 	} else {
 		return nil, false
 	}

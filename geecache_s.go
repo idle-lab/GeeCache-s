@@ -5,7 +5,6 @@ import (
 	"geecache-s/cachePolicy"
 	pb "geecache-s/geecachespb"
 	"geecache-s/singleflight"
-	"log"
 	"sync"
 )
 
@@ -76,6 +75,9 @@ type Group struct {
 }
 
 func NewGroup(name string, maxBytes int64, getter Getter, policy cachePolicy.CachePolicy) *Group {
+	if g, ok := groups[name]; ok {
+		return g
+	}
 	g := &Group{
 		name:   name,
 		getter: getter,
@@ -94,6 +96,9 @@ func NewGroup(name string, maxBytes int64, getter Getter, policy cachePolicy.Cac
 }
 
 func NewGroupWithOpts(name string, opts *GroupOptions) *Group {
+	if g, ok := groups[name]; ok {
+		return g
+	}
 	g := &Group{
 		name:   name,
 		getter: opts.Getter,
@@ -124,7 +129,6 @@ func (g *Group) RegisterPeers(peersPicker PeerPicker) {
 
 func (g *Group) Get(key string) (ByteView, error) {
 	if value, ok := g.mainCache.get(key); ok {
-		log.Println("[GeeCache-s hit]")
 		return value, nil
 	}
 
@@ -179,7 +183,7 @@ func (g *Group) Add(key string, value ByteView) error {
 		in := &pb.AddRequest{
 			Group: g.name,
 			Key:   key,
-			Value: value.btyes,
+			Value: value.Bytes,
 		}
 		empty := &pb.Empty{}
 		// add remotely
