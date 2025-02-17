@@ -7,6 +7,7 @@ import (
 	pb "geecache-s/geecachespb"
 	"hash/crc32"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -164,6 +165,7 @@ func (p *HttpPool) PickPeer(key string) (PeerHandler, bool) {
 		return nil, false
 	}
 	if httpHandler, ok := p.httpHandlers[peer]; ok {
+		log.Printf("pick peer:%s\n", peer)
 		return httpHandler, true
 	} else {
 		return nil, false
