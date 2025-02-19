@@ -1,4 +1,4 @@
-package network
+package server
 
 import (
 	"net"
@@ -8,7 +8,7 @@ import (
 type TCPServer struct {
 	Addr     net.TCPAddr
 	Listener net.Listener
-	Conns    []TCPHandler
+	Conns    []Handler
 
 	is_running bool
 }
@@ -37,6 +37,7 @@ func (t *TCPServer) dispatch() {
 }
 
 func (t *TCPServer) Start() {
+	t.is_running = true
 	if t.Listener == nil {
 		listener, err := net.Listen("tcp", t.Addr.String())
 		if err != nil {
@@ -55,5 +56,5 @@ func (t *TCPServer) Start() {
 }
 
 func (t *TCPServer) Stop() {
-
+	t.is_running = false
 }

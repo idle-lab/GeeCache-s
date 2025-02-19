@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"geecache-s/cachePolicy"
+	"geecache-s/lib/cachePolicy"
 	"reflect"
 	"testing"
 )

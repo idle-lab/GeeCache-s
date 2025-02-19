@@ -3,8 +3,8 @@ package geecaches
 import (
 	"bytes"
 	"fmt"
-	"geecache-s/consistenthash"
-	pb "geecache-s/geecachespb"
+	"geecache-s/lib/consistenthash"
+	pb "geecache-s/lib/geecachespb"
 	"hash/crc32"
 	"io"
 	"log"

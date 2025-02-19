@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	geecaches "geecache-s"
-	"geecache-s/cachePolicy"
+	"geecache-s/lib/cachePolicy"
 	"log"
 	"reflect"
 	"testing"

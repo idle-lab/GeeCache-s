@@ -2,9 +2,9 @@ package geecaches
 
 import (
 	"fmt"
-	"geecache-s/cachePolicy"
-	pb "geecache-s/geecachespb"
-	"geecache-s/singleflight"
+	"geecache-s/lib/cachePolicy"
+	pb "geecache-s/lib/geecachespb"
+	"geecache-s/lib/singleflight"
 	"sync"
 )
 

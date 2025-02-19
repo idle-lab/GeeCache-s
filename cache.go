@@ -1,7 +1,7 @@
 package geecaches
 
 import (
-	"geecache-s/cachePolicy"
+	"geecache-s/lib/cachePolicy"
 	"sync"
 )
 

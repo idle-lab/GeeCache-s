@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	geecaches "geecache-s"
-	"geecache-s/cachePolicy"
+	"geecache-s/lib/cachePolicy"
 	"io"
 	"log"
 	"net/http"

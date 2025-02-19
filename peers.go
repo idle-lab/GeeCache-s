@@ -1,6 +1,6 @@
 package geecaches
 
-import pb "geecache-s/geecachespb"
+import pb "geecache-s/lib/geecachespb"
 
 type PeerPicker interface {
 	PickPeer(key string) (PeerHandler, bool)

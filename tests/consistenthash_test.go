@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"geecache-s/consistenthash"
+	"geecache-s/lib/consistenthash"
 	"strconv"
 	"testing"
 )

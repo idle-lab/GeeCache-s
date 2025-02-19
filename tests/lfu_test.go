@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"geecache-s/cachePolicy"
+	"geecache-s/lib/cachePolicy"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
